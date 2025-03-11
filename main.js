@@ -3,6 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const ftp = require('basic-ftp');
 const Store = require('electron-store');
+const { autoUpdater } = require('electron-updater');
+
 
 // Initialize persistent storage with schema
 const store = new Store({
@@ -49,22 +51,39 @@ const store = new Store({
 let mainWindow;
 
 function createWindow() {
-    mainWindow = new BrowserWindow({
+    // Different configs for different platforms
+    let windowConfig = {
         width: 1200,
         height: 800,
         minWidth: 900,
         minHeight: 600,
+        icon: path.join(__dirname, 'assets/icon.png'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             contextIsolation: true,
             nodeIntegration: false
         }
-    });
+    };
+
+    // macOS-specific config 
+    if (process.platform === 'darwin') {
+        windowConfig.titleBarStyle = 'hiddenInset';
+    }
+    // Windows-specific config
+    else if (process.platform === 'win32') {
+        windowConfig.autoHideMenuBar = true; // Menu hidden but accessible via Alt key
+    }
+    // Linux config - standard
+    else {
+        windowConfig.autoHideMenuBar = true;
+    }
+
+    mainWindow = new BrowserWindow(windowConfig);
+
+    // Remove application menu on all platforms
+    mainWindow.setMenu(null);
 
     mainWindow.loadFile('index.html');
-
-    // Enable DevTools in development
-    // mainWindow.webContents.openDevTools();
 }
 
 app.whenReady().then(() => {
@@ -73,11 +92,29 @@ app.whenReady().then(() => {
     app.on('activate', function() {
         if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
+
+    autoUpdater.checkForUpdatesAndNotify();
+
 });
 
 app.on('window-all-closed', function() {
     if (process.platform !== 'darwin') app.quit();
 });
+
+// Listen for update events
+autoUpdater.on('update-available', () => {
+    console.log('Update available.');
+});
+
+autoUpdater.on('update-downloaded', () => {
+    console.log('Update downloaded. Installing now...');
+    autoUpdater.quitAndInstall();
+});
+
+autoUpdater.on('error', (err) => {
+    console.log('Update error:', err);
+});
+
 
 // Map to store active FTP connections
 const ftpConnections = new Map();

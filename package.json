@@ -1,22 +1,51 @@
 {
-    "name": "desktop-ftp-client",
+    "name": "kites-ftp-client",
     "version": "1.0.0",
     "description": "Cross-platform desktop FTP client for Windows and Mac",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-        "package-win": "electron-packager . --overwrite --platform=win32 --arch=ia32 --icon=assets/icons/win/icon.ico --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"FTP Client\""
+        "dist": "electron-builder"
     },
-    "author": "Your Name",
+    "build": {
+        "appId": "dev.kites.ftp",
+        "productName": "Kites FTP Client",
+        "directories": {
+            "output": "dist"
+        },
+        "files": [
+            "node_modules/**/*",
+            "main.js",
+            "renderer.js",
+            "preload.js",
+            "index.html",
+            "package.json"
+        ],
+        "win": {
+            "icon": "assets/icon.ico",
+            "target": "nsis"
+        },
+        "mac": {
+            "icon": "assets/icon.icns",
+            "target": "dmg"
+        },
+        "linux": {
+            "icon": "assets/icon.png",
+            "target": "AppImage"
+        }
+    },
+    "author": "Kites.Dev LLC",
     "license": "MIT",
     "devDependencies": {
         "electron": "^28.3.3",
-        "electron-packager": "^17.1.2"
+        "electron-builder": "^25.1.8",
+        "electron-packager": "^17.1.2",
+        "electron-updater": "^6.3.9"
     },
     "dependencies": {
         "basic-ftp": "^5.0.5",
         "electron-store": "^8.2.0",
-        "split.js": "^1.6.5"
+        "split.js": "^1.6.5",
+        "electron-updater": "^6.3.9"
     }
 }
