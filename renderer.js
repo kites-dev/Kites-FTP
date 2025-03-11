@@ -1200,6 +1200,11 @@ async function createFile(connectionId) {
       showNotification(`File ${fileName} created!`, 'success', connectionId);
       await refreshFileList(connectionId);
       
+      // Clear this notification after 2 seconds
+      setTimeout(() => {
+        hideNotification(connectionId);
+      }, 2000);
+      
       // Ask if user wants to edit the file
       const shouldEdit = await showConfirmDialog(`Do you want to edit ${fileName} now?`);
       if (shouldEdit) {
@@ -1223,7 +1228,12 @@ async function createFile(connectionId) {
 }
 
 // Function to check for file changes
+// Function to check for file changes
 function checkForFileChanges(connectionId, fileInfo) {
+  // Store the original modification time
+  const originalModTime = fileInfo.lastModified;
+  let lastCheckedModTime = originalModTime;
+  
   // Set up an interval to check if the file has been modified
   const intervalId = setInterval(async () => {
     try {
@@ -1233,30 +1243,54 @@ function checkForFileChanges(connectionId, fileInfo) {
         return;
       }
       
-      // Check if the file exists and has been modified
-      const result = await window.ftpAPI.saveEditedFile(fileInfo);
+      // Check file stats to see if it has been modified
+      const stats = await window.ftpAPI.getFileStats(fileInfo.localPath);
       
-      if (result.success && result.uploaded) {
-        showNotification(`Changes to ${fileInfo.fileName} saved back to server!`, 'success', connectionId);
+      if (!stats.success) {
+        console.error('Error checking file stats:', stats.error);
+        return;
+      }
+      
+      const currentModTime = new Date(stats.modifiedTime);
+      
+      // Compare with the last checked time, not the original time
+      if (currentModTime > lastCheckedModTime) {
+        console.log('File modified:', fileInfo.fileName);
+        console.log('Previous mod time:', lastCheckedModTime);
+        console.log('Current mod time:', currentModTime);
         
-        // Remove from edited files list
-        if (state.editedFiles.has(connectionId)) {
-          state.editedFiles.set(
-            connectionId,
-            state.editedFiles.get(connectionId).filter(f => f.localPath !== fileInfo.localPath)
-          );
+        // Update the file on the server
+        const result = await window.ftpAPI.uploadFrom({
+          connectionId,
+          localPath: fileInfo.localPath,
+          remotePath: fileInfo.remotePath
+        });
+        
+        if (result.success) {
+          showNotification(`Changes to ${fileInfo.fileName} saved back to server!`, 'success', connectionId);
+          // Update the last checked modification time
+          lastCheckedModTime = currentModTime;
+          
+          // Refresh file list to show updated modification times
+          await refreshFileList(connectionId);
+        } else {
+          showNotification(`Failed to save changes: ${result.error}`, 'error', connectionId);
         }
-        
-        // Stop checking this file
-        clearInterval(intervalId);
-        
-        // Refresh file list to show updated modification times
-        await refreshFileList(connectionId);
       }
     } catch (error) {
       console.error('Error checking for file changes:', error);
     }
-  }, 5000); // Check every 5 seconds
+  }, 3000); // Check every 3 seconds
+  
+  // Store interval ID so we can clear it if needed
+  if (!state.fileWatchers) {
+    state.fileWatchers = new Map();
+  }
+  
+  // Store by file path to avoid duplicates
+  state.fileWatchers.set(fileInfo.localPath, intervalId);
+  
+  return intervalId;
 }
 
 // Save all edited files for a connection
@@ -1561,7 +1595,7 @@ function showNotification(message, type = 'info', connectionId = null) {
   }
   
   // Set notification style based on type
-  let classes = 'p-2 text-center ';
+  let classes = 'notification p-2 text-center ';
   switch (type) {
     case 'success':
       classes += 'bg-green-100 text-green-800';

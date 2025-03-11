@@ -6,6 +6,7 @@ contextBridge.exposeInMainWorld('ftpAPI', {
     saveSettings: (settings) => ipcRenderer.invoke('save-settings', settings),
     pickEditor: () => ipcRenderer.invoke('pick-editor'),
 
+
     // Connection management
     connect: (connectionInfo) => ipcRenderer.invoke('connect-ftp', connectionInfo),
     disconnect: (params) => ipcRenderer.invoke('disconnect-ftp', params),
@@ -14,6 +15,9 @@ contextBridge.exposeInMainWorld('ftpAPI', {
     getRecentConnections: () => ipcRenderer.invoke('get-recent-connections'),
     saveConnection: (connection) => ipcRenderer.invoke('save-connection', connection),
     deleteConnection: (connectionId) => ipcRenderer.invoke('delete-connection', connectionId),
+    getFileStats: (filePath) => ipcRenderer.invoke('getFileStats', filePath),
+    uploadFrom: (params) => ipcRenderer.invoke('uploadFrom', params),
+
 
     // File/directory operations
     listDirectory: (params) => ipcRenderer.invoke('list-directory', params),

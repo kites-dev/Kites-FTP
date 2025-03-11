@@ -78,6 +78,7 @@ function createWindow() {
         windowConfig.autoHideMenuBar = true;
     }
 
+
     mainWindow = new BrowserWindow(windowConfig);
 
     // Remove application menu on all platforms
@@ -221,6 +222,37 @@ ipcMain.handle('connect-ftp', async(event, connectionInfo) => {
 ipcMain.handle('get-saved-connections', () => {
     return store.get('connections') || [];
 });
+
+// Get file stats
+ipcMain.handle('getFileStats', async(event, filePath) => {
+    try {
+        const stats = fs.statSync(filePath);
+        return {
+            success: true,
+            modifiedTime: stats.mtime.getTime(),
+            size: stats.size
+        };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
+
+// Upload from local path to remote path
+ipcMain.handle('uploadFrom', async(event, { connectionId, localPath, remotePath }) => {
+    try {
+        const connection = ftpConnections.get(connectionId);
+        if (!connection) {
+            return { success: false, error: 'Connection not found' };
+        }
+
+        await connection.client.uploadFrom(localPath, remotePath);
+        return { success: true };
+    } catch (err) {
+        return { success: false, error: err.message };
+    }
+});
+
 
 // Get recent connections
 ipcMain.handle('get-recent-connections', () => {
