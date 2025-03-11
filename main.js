@@ -67,7 +67,7 @@ function createWindow() {
 
     // macOS-specific config 
     if (process.platform === 'darwin') {
-        windowConfig.titleBarStyle = 'hiddenInset';
+        windowConfig.titleBarStyle = 'default';
     }
     // Windows-specific config
     else if (process.platform === 'win32') {
