@@ -1,145 +1,424 @@
 <footer>
-    <div class="container footer-content"></div>
-    <div class="logo"></div>
-    <i class="fas fa-paper-plane"></i> Kites FTP Client
-    </div>
-    <div class="social-links"></div>
-    <a href="https://github.com/kites-dev/Kites-FTP"><i class="fab fa-github"></i></a>
-    <a href="mailto:kitesdev@gmail.com"><i class="fas fa-envelope"></i></a>
-    </div>
-    <div style="margin-top: 20px;"></div>
-    <a href="https://buymeacoffee.com/kites"></a>
-    <img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-donate-yellow" alt="Buy Me A Coffee">
-    </a>
-    </div>
-    <div class="copyright"></div>
-    --secondary: #38a169; --text: #2d3748; --light-bg: #f8f9fb; --card-bg: #ffffff; --border: #e2e8f0; } * { margin: 0; padding: 0; box-sizing: border-box; } html { scroll-behavior: smooth; } body { font-family: 'Inter', sans-serif; color: var(--text); background-color:
-    var(--light-bg); line-height: 1.6; } a { color: var(--primary); text-decoration: none; } a:hover { text-decoration: underline; } .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; } header { background: linear-gradient(135deg, var(--primary)
-    0%, var(--primary-dark) 100%); color: white; padding: 20px 0; position: fixed; width: 100%; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); } .header-content { display: flex; justify-content: space-between; align-items: center; }
-    .logo { display: flex; align-items: center; font-weight: 700; font-size: 1.8rem; } .logo i { margin-right: 10px; } nav ul { display: flex; list-style: none; } nav ul li { margin-left: 20px; } nav ul li a { color: white; font-weight: 500; transition:
-    all 0.3s; } nav ul li a:hover { text-decoration: none; opacity: 0.8; } .hero { padding: 150px 0 80px; text-align: center; background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('pattern.png'); background-attachment: fixed;
-    } .hero h1 { font-size: 3rem; margin-bottom: 20px; color: var(--primary); } .hero p { font-size: 1.2rem; max-width: 800px; margin: 0 auto 40px; } .btn { display: inline-block; padding: 12px 30px; background: linear-gradient(to bottom, var(--primary),
-    var(--primary-dark)); color: white; border-radius: 6px; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 6px rgba(65, 105, 225, 0.2); text-decoration: none; } .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(65, 105,
-    225, 0.3); text-decoration: none; } .btn-secondary { background: linear-gradient(to bottom, var(--secondary), #2f855a); margin-left: 15px; } .btn-github { background: linear-gradient(to bottom, #333, #111); margin-left: 15px; } .screenshot { max-width:
-    90%; border-radius: 10px; box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); margin-top: 40px; } section { padding: 80px 0; } h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; color: var(--primary); } .features { background-color: white;
-    } .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; } .feature-card { background: var(--card-bg); border-radius: 10px; padding: 30px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); transition: all
-    0.3s; text-align: center; } .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); } .feature-card i { font-size: 3rem; color: var(--primary); margin-bottom: 20px; } .feature-card h3 { font-size: 1.5rem; margin-bottom:
-    15px; } .screenshot-section { text-align: center; } .screenshots-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; margin-top: 20px; } .screenshot-item { overflow: hidden; border-radius: 10px; box-shadow: 0 5px 15px rgba(0, 0,
-    0, 0.1); transition: all 0.3s; } .screenshot-item:hover { transform: scale(1.02); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); } .screenshot-item img { width: 100%; height: auto; display: block; } .installation { background: var(--light-bg); } pre
-    { background: #282a36; color: #f8f8f2; border-radius: 8px; padding: 20px; overflow-x: auto; margin: 20px 0; font-family: 'Fira Code', monospace; } footer { background: var(--primary-dark); color: white; padding: 50px 0 20px; text-align: center; }
-    .footer-content { display: flex; flex-direction: column; align-items: center; } .social-links { display: flex; margin: 20px 0; } .social-links a { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius:
-    50%; background: rgba(255, 255, 255, 0.1); color: white; margin: 0 10px; transition: all 0.3s; } .social-links a:hover { background: rgba(255, 255, 255, 0.2); transform: translateY(-3px); } .copyright { margin-top: 20px; font-size: 0.9rem; opacity:
-    0.8; } /* Mobile styles */ @media (max-width: 768px) { .header-content { flex-direction: column; } nav ul { margin-top: 20px; } .hero h1 { font-size: 2.3rem; } .screenshots-grid { grid-template-columns: 1fr; } .btn { display: block; margin: 10px auto;
-    width: 80%; text-align: center; } .btn-secondary, .btn-github { margin-left: 0; } }
-    </style>
-    </head>
+    <div class="container footer-content">
 
-    <body>
-        <header>
-            <div class="container header-content">
-                <div class="logo">
-                    <i class="fas fa-paper-plane"></i> Kites FTP Client
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Kites FTP Client - Modern Cross-Platform FTP Client</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+            <style>
+                 :root {
+                    --primary: #4169e1;
+                    --primary-dark: #375bd0;
+                    --secondary: #38a169;
+                    --text: #2d3748;
+                    --light-bg: #f8f9fb;
+                    --card-bg: #ffffff;
+                    --border: #e2e8f0;
+                }
+                
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+                
+                html {
+                    scroll-behavior: smooth;
+                }
+                
+                body {
+                    font-family: 'Inter', sans-serif;
+                    color: var(--text);
+                    background-color: var(--light-bg);
+                    line-height: 1.6;
+                }
+                
+                a {
+                    color: var(--primary);
+                    text-decoration: none;
+                }
+                
+                a:hover {
+                    text-decoration: underline;
+                }
+                
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 0 20px;
+                }
+                
+                header {
+                    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+                    color: white;
+                    padding: 20px 0;
+                    position: fixed;
+                    width: 100%;
+                    top: 0;
+                    z-index: 100;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                }
+                
+                .header-content {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .logo {
+                    display: flex;
+                    align-items: center;
+                    font-weight: 700;
+                    font-size: 1.8rem;
+                }
+                
+                .logo i {
+                    margin-right: 10px;
+                }
+                
+                nav ul {
+                    display: flex;
+                    list-style: none;
+                }
+                
+                nav ul li {
+                    margin-left: 20px;
+                }
+                
+                nav ul li a {
+                    color: white;
+                    font-weight: 500;
+                    transition: all 0.3s;
+                }
+                
+                nav ul li a:hover {
+                    text-decoration: none;
+                    opacity: 0.8;
+                }
+                
+                .hero {
+                    padding: 150px 0 80px;
+                    text-align: center;
+                    background: linear-gradient(rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url('pattern.png');
+                    background-attachment: fixed;
+                }
+                
+                .hero h1 {
+                    font-size: 3rem;
+                    margin-bottom: 20px;
+                    color: var(--primary);
+                }
+                
+                .hero p {
+                    font-size: 1.2rem;
+                    max-width: 800px;
+                    margin: 0 auto 40px;
+                }
+                
+                .btn {
+                    display: inline-block;
+                    padding: 12px 30px;
+                    background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+                    color: white;
+                    border-radius: 6px;
+                    font-weight: 600;
+                    transition: all 0.3s;
+                    box-shadow: 0 4px 6px rgba(65, 105, 225, 0.2);
+                    text-decoration: none;
+                }
+                
+                .btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 7px 14px rgba(65, 105, 225, 0.3);
+                    text-decoration: none;
+                }
+                
+                .btn-secondary {
+                    background: linear-gradient(to bottom, var(--secondary), #2f855a);
+                    margin-left: 15px;
+                }
+                
+                .btn-github {
+                    background: linear-gradient(to bottom, #333, #111);
+                    margin-left: 15px;
+                }
+                
+                .screenshot {
+                    max-width: 90%;
+                    border-radius: 10px;
+                    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+                    margin-top: 40px;
+                }
+                
+                section {
+                    padding: 80px 0;
+                }
+                
+                h2 {
+                    text-align: center;
+                    font-size: 2.5rem;
+                    margin-bottom: 50px;
+                    color: var(--primary);
+                }
+                
+                .features {
+                    background-color: white;
+                }
+                
+                .features-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                    gap: 40px;
+                }
+                
+                .feature-card {
+                    background: var(--card-bg);
+                    border-radius: 10px;
+                    padding: 30px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                    transition: all 0.3s;
+                    text-align: center;
+                }
+                
+                .feature-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                }
+                
+                .feature-card i {
+                    font-size: 3rem;
+                    color: var(--primary);
+                    margin-bottom: 20px;
+                }
+                
+                .feature-card h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 15px;
+                }
+                
+                .screenshot-section {
+                    text-align: center;
+                }
+                
+                .screenshots-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 30px;
+                    margin-top: 20px;
+                }
+                
+                .screenshot-item {
+                    overflow: hidden;
+                    border-radius: 10px;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                    transition: all 0.3s;
+                }
+                
+                .screenshot-item:hover {
+                    transform: scale(1.02);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                }
+                
+                .screenshot-item img {
+                    width: 100%;
+                    height: auto;
+                    display: block;
+                }
+                
+                .installation {
+                    background: var(--light-bg);
+                }
+                
+                pre {
+                    background: #282a36;
+                    color: #f8f8f2;
+                    border-radius: 8px;
+                    padding: 20px;
+                    overflow-x: auto;
+                    margin: 20px 0;
+                    font-family: 'Fira Code', monospace;
+                }
+                
+                footer {
+                    background: var(--primary-dark);
+                    color: white;
+                    padding: 50px 0 20px;
+                    text-align: center;
+                }
+                
+                .footer-content {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                
+                .social-links {
+                    display: flex;
+                    margin: 20px 0;
+                }
+                
+                .social-links a {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.1);
+                    color: white;
+                    margin: 0 10px;
+                    transition: all 0.3s;
+                }
+                
+                .social-links a:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                    transform: translateY(-3px);
+                }
+                
+                .copyright {
+                    margin-top: 20px;
+                    font-size: 0.9rem;
+                    opacity: 0.8;
+                }
+                /* Mobile styles */
+                
+                @media (max-width: 768px) {
+                    .header-content {
+                        flex-direction: column;
+                    }
+                    nav ul {
+                        margin-top: 20px;
+                    }
+                    .hero h1 {
+                        font-size: 2.3rem;
+                    }
+                    .screenshots-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    .btn {
+                        display: block;
+                        margin: 10px auto;
+                        width: 80%;
+                        text-align: center;
+                    }
+                    .btn-secondary,
+                    .btn-github {
+                        margin-left: 0;
+                    }
+                }
+            </style>
+        </head>
+
+        <body>
+            <header>
+                <div class="container header-content">
+                    <div class="logo">
+                        <i class="fas fa-paper-plane"></i> Kites FTP Client
+                    </div>
+                    <nav>
+                        <ul>
+                            <li><a href="#features">Features</a></li>
+                            <li><a href="#screenshots">Screenshots</a></li>
+                            <li><a href="#installation">Installation</a></li>
+                            <li><a href="https://github.com/kites-dev/Kites-FTP">GitHub</a></li>
+                        </ul>
+                    </nav>
                 </div>
-                <nav>
-                    <ul>
-                        <li><a href="#features">Features</a></li>
-                        <li><a href="#screenshots">Screenshots</a></li>
-                        <li><a href="#installation">Installation</a></li>
-                        <li><a href="https://github.com/kites-dev/Kites-FTP">GitHub</a></li>
-                    </ul>
-                </nav>
-            </div>
-        </header>
+            </header>
 
-        <section class="hero">
-            <div class="container">
-                <h1>Kites FTP Client</h1>
-                <p>A modern, cross-platform desktop FTP client with multi-connection support, built with Electron.</p>
-                <a href="#download" class="btn">Download</a>
-                <a href="#installation" class="btn btn-secondary">Get Started</a>
-                <a href="https://github.com/kites-dev/Kites-FTP" class="btn btn-github">
-                    <i class="fab fa-github"></i> View on GitHub
-                </a>
-                <img src="screenshoots/main.png" alt="Kites FTP Client Screenshot" class="screenshot">
-            </div>
-        </section>
+            <section class="hero">
+                <div class="container">
+                    <h1>Kites FTP Client</h1>
+                    <p>A modern, cross-platform desktop FTP client with multi-connection support, built with Electron.</p>
+                    <a href="#download" class="btn">Download</a>
+                    <a href="#installation" class="btn btn-secondary">Get Started</a>
+                    <a href="https://github.com/kites-dev/Kites-FTP" class="btn btn-github">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
+                    <img src="screenshoots/main.png" alt="Kites FTP Client Screenshot" class="screenshot">
+                </div>
+            </section>
 
-        <section id="features" class="features">
-            <div class="container">
-                <h2>Features</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-project-diagram"></i>
-                        <h3>Multiple Connections</h3>
-                        <p>Connect to multiple FTP servers simultaneously and switch between them with tabs.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-folder-tree"></i>
-                        <h3>File Explorer</h3>
-                        <p>Explorer-like interface with directory tree and file listing for intuitive navigation.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-file-upload"></i>
-                        <h3>File Operations</h3>
-                        <p>Upload, download, create, edit, and delete files and directories with ease.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-mouse"></i>
-                        <h3>Context Menus</h3>
-                        <p>Right-click context menus for quick access to common operations.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-edit"></i>
-                        <h3>Custom Editor</h3>
-                        <p>Use your preferred text editor for editing remote files directly.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-moon"></i>
-                        <h3>Dark Mode</h3>
-                        <p>Toggle between light and dark themes for comfortable viewing.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-search"></i>
-                        <h3>Connection Management</h3>
-                        <p>Save, organize, and search your FTP connections for quick access.</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-desktop"></i>
-                        <h3>Cross-Platform</h3>
-                        <p>Works on Windows, macOS, and Linux for a consistent experience.</p>
+            <section id="features" class="features">
+                <div class="container">
+                    <h2>Features</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-project-diagram"></i>
+                            <h3>Multiple Connections</h3>
+                            <p>Connect to multiple FTP servers simultaneously and switch between them with tabs.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-folder-tree"></i>
+                            <h3>File Explorer</h3>
+                            <p>Explorer-like interface with directory tree and file listing for intuitive navigation.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-file-upload"></i>
+                            <h3>File Operations</h3>
+                            <p>Upload, download, create, edit, and delete files and directories with ease.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-mouse"></i>
+                            <h3>Context Menus</h3>
+                            <p>Right-click context menus for quick access to common operations.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-edit"></i>
+                            <h3>Custom Editor</h3>
+                            <p>Use your preferred text editor for editing remote files directly.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-moon"></i>
+                            <h3>Dark Mode</h3>
+                            <p>Toggle between light and dark themes for comfortable viewing.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-search"></i>
+                            <h3>Connection Management</h3>
+                            <p>Save, organize, and search your FTP connections for quick access.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-desktop"></i>
+                            <h3>Cross-Platform</h3>
+                            <p>Works on Windows, macOS, and Linux for a consistent experience.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="screenshots" class="screenshot-section">
-            <div class="container">
-                <h2>Screenshots</h2>
-                <div class="screenshots-grid">
-                    <div class="screenshot-item">
-                        <img src="screenshoots/main.png" alt="Light Theme">
-                    </div>
-                    <div class="screenshot-item">
-                        <img src="screenshoots/dark_theme.png" alt="Dark Theme">
-                    </div>
-                    <div class="screenshot-item">
-                        <img src="screenshoots/multi-connection.png" alt="Multiple Connections">
-                    </div>
-                    <div class="screenshot-item">
-                        <img src="screenshoots/file_management.png" alt="File Management">
+            <section id="screenshots" class="screenshot-section">
+                <div class="container">
+                    <h2>Screenshots</h2>
+                    <div class="screenshots-grid">
+                        <div class="screenshot-item">
+                            <img src="screenshoots/main.png" alt="Light Theme">
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshoots/dark_theme.png" alt="Dark Theme">
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshoots/multi-connection.png" alt="Multiple Connections">
+                        </div>
+                        <div class="screenshot-item">
+                            <img src="screenshoots/file_management.png" alt="File Management">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="installation" class="installation">
-            <div class="container">
-                <h2>Installation</h2>
-                <h3>Download</h3>
-                <p>Download the latest release for your platform from the <a href="https://github.com/kites-dev/Kites-FTP/releases/">Releases</a> page.</p>
+            <section id="installation" class="installation">
+                <div class="container">
+                    <h2>Installation</h2>
+                    <h3>Download</h3>
+                    <p>Download the latest release for your platform from the <a href="https://github.com/kites-dev/Kites-FTP/releases/">Releases</a> page.</p>
 
-                <h3>Build from Source</h3>
-                <pre>
+                    <h3>Build from Source</h3>
+                    <pre>
 # Clone this repository
 git clone https://github.com/kites-dev/Kites-FTP.git
 
@@ -156,45 +435,39 @@ npm start
 npm run dist
 
 </pre>
-            </div>
-        </section>
-
-        <section id="download">
-            <div class="container" style="text-align: center;">
-                <h2>Download</h2>
-                <p>Get Kites FTP Client for your platform</p>
-                <div style="margin-top: 30px;">
-                    <a href="https://github.com/kites-dev/Kites-FTP/releases/download/v1.0.0/Kites.FTP.Client.Setup.1.0.0.exe" class="btn">
-                        <i class="fab fa-windows"></i> Windows
-                    </a>
-                    <a href="https://github.com/kites-dev/Kites-FTP/releases/download/v1.0.0/Kites.FTP.Client-1.0.0-arm64.dmg" class="btn">
-                        <i class="fab fa-apple"></i> macOS
-                    </a>
-
                 </div>
-            </div>
-        </section>
+            </section>
 
-        <footer>
-            <div class="container footer-content">
-                <div class="logo"></div>
-                <i class="fas fa-paper-plane"></i> Kites FTP Client
-            </div>
-            <div class="social-links"></div>
-            <a href="https://github.com/kites-dev/Kites-FTP"><i class="fab fa-github"></i></a>
-            <a href="mailto:kitesdev@gmail.com"><i class="fas fa-envelope"></i></a>
-            </div>
-            <div class="donate"></div>
-            <a href="https://buymeacoffee.com/kites"></a>
-            <img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-donate-yellow" alt="Buy Me A Coffee">
-            </a>
-            </div>
-            <div class="copyright">
-                &copy; 2025 Kites FTP Client. Released under the MIT License.
-            </div>
-            </div>
-        </footer>
-        </div>
-    </body>
+            <section id="download">
+                <div class="container" style="text-align: center;">
+                    <h2>Download</h2>
+                    <p>Get Kites FTP Client for your platform</p>
+                    <div style="margin-top: 30px;">
+                        <a href="https://github.com/kites-dev/Kites-FTP/releases/download/v1.0.0/Kites.FTP.Client.Setup.1.0.0.exe" class="btn">
+                            <i class="fab fa-windows"></i> Windows
+                        </a>
+                        <a href="https://github.com/kites-dev/Kites-FTP/releases/download/v1.0.0/Kites.FTP.Client-1.0.0-arm64.dmg" class="btn">
+                            <i class="fab fa-apple"></i> macOS
+                        </a>
 
-    </html>
+                    </div>
+                </div>
+            </section>
+
+            <footer>
+                <div class="container footer-content">
+                    <div class="logo">
+                        <i class="fas fa-paper-plane"></i> Kites FTP Client
+                    </div>
+                    <div class="social-links">
+                        <a href="https://github.com/kites-dev/Kites-FTP"><i class="fab fa-github"></i></a>
+                        <a href="mailto:kitesdev@gmail.com"><i class="fas fa-envelope"></i></a>
+                    </div>
+                    <div class="copyright">
+                        &copy; 2025 Kites FTP Client. Released under the MIT License.
+                    </div>
+                </div>
+            </footer>
+        </body>
+
+        </html>
