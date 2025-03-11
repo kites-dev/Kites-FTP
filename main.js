@@ -241,6 +241,8 @@ ipcMain.handle('getFileStats', async(event, filePath) => {
 // Upload from local path to remote path
 ipcMain.handle('uploadFrom', async(event, { connectionId, localPath, remotePath }) => {
     try {
+        console.log(`uploadFrom: Uploading ${localPath} to ${remotePath}`);
+
         const connection = ftpConnections.get(connectionId);
         if (!connection) {
             return { success: false, error: 'Connection not found' };
@@ -249,6 +251,7 @@ ipcMain.handle('uploadFrom', async(event, { connectionId, localPath, remotePath 
         await connection.client.uploadFrom(localPath, remotePath);
         return { success: true };
     } catch (err) {
+        console.error('uploadFrom error:', err);
         return { success: false, error: err.message };
     }
 });
@@ -420,7 +423,7 @@ ipcMain.handle('upload-file', async(event, { connectionId }) => {
 });
 
 // Edit file
-ipcMain.handle('edit-file', async(event, { connectionId, remotePath, fileName }) => {
+ipcMain.handle('edit-file', async(event, { connectionId, remotePath, fullRemotePath, fileName }) => {
     try {
         const connection = ftpConnections.get(connectionId);
         if (!connection) {
@@ -437,7 +440,8 @@ ipcMain.handle('edit-file', async(event, { connectionId, remotePath, fileName })
         const localFilePath = path.join(tempDir, connectionId + '_' + fileName);
         const fileInfo = {
             connectionId,
-            remotePath,
+            remotePath, // The file name itself
+            fullRemotePath, // The full path including directories
             localPath: localFilePath,
             fileName,
             lastModified: null
@@ -486,14 +490,23 @@ ipcMain.handle('save-edited-file', async(event, fileInfo) => {
         const stats = fs.statSync(fileInfo.localPath);
 
         if (stats.mtime > fileInfo.lastModified) {
-            // File was modified, upload it back
-            await connection.client.uploadFrom(fileInfo.localPath, fileInfo.remotePath);
+            // File was modified, upload it back using the FULL remote path
+            const remotePath = fileInfo.fullRemotePath || fileInfo.remotePath;
+            console.log(`Uploading to: ${remotePath}`);
+
+            // If the full path is available, use it
+            await connection.client.uploadFrom(fileInfo.localPath, remotePath);
+
+            // Update the last modified time
+            fileInfo.lastModified = stats.mtime;
+
             return { success: true, uploaded: true };
         } else {
             // File wasn't modified
             return { success: true, uploaded: false };
         }
     } catch (err) {
+        console.error('Error saving file:', err);
         return { success: false, error: err.message };
     }
 });

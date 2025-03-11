@@ -1129,6 +1129,7 @@ async function downloadFile(connectionId, fileName) {
 }
 
 // Edit file
+// Edit file
 async function editFile(connectionId, fileName) {
   const connection = state.connections.get(connectionId);
   if (!connection) return;
@@ -1141,12 +1142,18 @@ async function editFile(connectionId, fileName) {
     fileName = Array.from(selectedItems)[0];
   }
   
+  // Get the current directory to store with the file info
+  const currentDir = connection.currentDir;
+  // Build the full remote path
+  const fullRemotePath = currentDir === '/' ? `/${fileName}` : `${currentDir}/${fileName}`;
+  
   showNotification(`Opening ${fileName} for editing...`, 'info', connectionId);
   
   try {
     const result = await window.ftpAPI.editFile({
       connectionId,
-      remotePath: fileName,
+      remotePath: fileName, // Just the filename for the server request
+      fullRemotePath: fullRemotePath, // Store the full path for later use
       fileName
     });
     
@@ -1228,11 +1235,14 @@ async function createFile(connectionId) {
 }
 
 // Function to check for file changes
-// Function to check for file changes
 function checkForFileChanges(connectionId, fileInfo) {
   // Store the original modification time
   const originalModTime = fileInfo.lastModified;
   let lastCheckedModTime = originalModTime;
+  
+  console.log('Watching for changes to file:', fileInfo.fileName);
+  console.log('Using local path:', fileInfo.localPath);
+  console.log('Using remote path:', fileInfo.fullRemotePath || fileInfo.remotePath);
   
   // Set up an interval to check if the file has been modified
   const intervalId = setInterval(async () => {
@@ -1259,11 +1269,14 @@ function checkForFileChanges(connectionId, fileInfo) {
         console.log('Previous mod time:', lastCheckedModTime);
         console.log('Current mod time:', currentModTime);
         
+        // Use fullRemotePath if available, otherwise fall back to remotePath
+        const remotePath = fileInfo.fullRemotePath || fileInfo.remotePath;
+        
         // Update the file on the server
         const result = await window.ftpAPI.uploadFrom({
           connectionId,
           localPath: fileInfo.localPath,
-          remotePath: fileInfo.remotePath
+          remotePath: remotePath
         });
         
         if (result.success) {
