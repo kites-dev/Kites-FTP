@@ -71,7 +71,7 @@ function createWindow() {
     }
     // Windows-specific config
     else if (process.platform === 'win32') {
-        windowConfig.autoHideMenuBar = false; // Menu hidden but accessible via Alt key
+        windowConfig.autoHideMenuBar = true; // Menu hidden but accessible via Alt key
     }
     // Linux config - standard
     else {
@@ -82,7 +82,7 @@ function createWindow() {
     mainWindow = new BrowserWindow(windowConfig);
 
     // Remove application menu on all platforms
-    //mainWindow.setMenu(null);
+    mainWindow.setMenu(null);
 
     mainWindow.loadFile('index.html');
 }
