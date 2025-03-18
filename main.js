@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const chokidar = require('chokidar');
 const ftp = require('basic-ftp');
 const Store = require('electron-store');
 const { autoUpdater } = require('electron-updater');
@@ -626,5 +627,66 @@ ipcMain.handle('createTempFile', async() => {
         return { success: true, path: tempFilePath };
     } catch (err) {
         return { success: false, error: err.message };
+    }
+});
+
+
+
+// Map to store file watchers
+const fileWatchers = new Map();
+
+// Watch file handler
+ipcMain.handle('watch-file', async(event, path) => {
+    try {
+        const watcherId = Date.now().toString();
+
+        // Create a watcher
+        const watcher = chokidar.watch(path, {
+            persistent: true,
+            awaitWriteFinish: {
+                stabilityThreshold: 2000,
+                pollInterval: 100
+            }
+        });
+
+        // Set up change event
+        watcher.on('change', (path, stats) => {
+            event.sender.send(`file-changed-${watcherId}`, null, {
+                modifiedTime: stats ? stats.mtime : new Date(),
+                size: stats ? stats.size : 0
+            });
+        });
+
+        // Set up error event
+        watcher.on('error', (error) => {
+            event.sender.send(`file-changed-${watcherId}`, error.toString(), null);
+        });
+
+        // Store watcher reference
+        fileWatchers.set(watcherId, {
+            path,
+            watcher
+        });
+
+        return watcherId;
+    } catch (error) {
+        console.error('Error watching file:', error);
+        throw error;
+    }
+});
+
+// Unwatch file handler
+ipcMain.handle('unwatch-file', async(event, path, watcherId) => {
+    try {
+        const watcherInfo = fileWatchers.get(watcherId);
+        if (watcherInfo && watcherInfo.watcher) {
+            await watcherInfo.watcher.close();
+            fileWatchers.delete(watcherId);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error unwatching file:', error);
+        throw error;
     }
 });

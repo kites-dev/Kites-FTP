@@ -33,6 +33,18 @@ contextBridge.exposeInMainWorld('ftpAPI', {
     editFile: (params) => ipcRenderer.invoke('edit-file', params),
     saveEditedFile: (fileInfo) => ipcRenderer.invoke('save-edited-file', fileInfo),
     createTempFile: () => ipcRenderer.invoke('createTempFile'),
-    uploadEmptyFile: (params) => ipcRenderer.invoke('uploadEmptyFile', params)
+    uploadEmptyFile: (params) => ipcRenderer.invoke('uploadEmptyFile', params),
+    watchFile: (path, callback) => {
+        return ipcRenderer.invoke('watch-file', path).then(watcherId => {
+            // Set up event listener for file changes
+            ipcRenderer.on(`file-changed-${watcherId}`, (event, err, stats) => {
+                callback(err, stats);
+            });
+            return watcherId;
+        });
+    },
+    unwatchFile: (path, watcherId) => {
+        return ipcRenderer.invoke('unwatch-file', path, watcherId);
+    }
 
 });

@@ -363,7 +363,12 @@ connectionSearch.addEventListener('input', async () => {
     showLoading(`Connecting to ${connectionInfo.host}...`);
     
     try {
-      const result = await window.ftpAPI.connect(connectionInfo);
+      const connectionOptions = {
+        ...connectionInfo,
+        keepalive: 30000 // Send keepalive commands every 30 seconds
+      };
+
+      const result = await window.ftpAPI.connect(connectionOptions);
       
       if (result.success) {
         // Create a new connection tab and view
@@ -776,69 +781,215 @@ connectionSearch.addEventListener('input', async () => {
       console.error('Error loading directory contents:', error);
     }
   }
-  
-  // Refresh file list
-  async function refreshFileList(connectionId, path) {
-    const connection = state.connections.get(connectionId);
-    if (!connection) return;
-    
-    const connectionView = document.getElementById(`connection-${connectionId}`);
-    const fileList = connectionView.querySelector('.file-list');
-    const currentPathElement = connectionView.querySelector('.current-path');
-    const statusText = connectionView.querySelector('.status-text');
-    const itemsCount = connectionView.querySelector('.items-count');
-    
-    statusText.textContent = 'Loading...';
-    
+
+  async function reconnectIfNeeded(connectionId) {
     try {
-      // Use specified path or get current directory
-      if (!path) {
-        const pwdResult = await window.ftpAPI.currentDirectory({ connectionId });
-        if (pwdResult.success) {
-          path = pwdResult.path;
-          currentPathElement.textContent = path;
-          connection.currentDir = path;
-        } else {
-          showNotification(`Failed to get current directory: ${pwdResult.error}`, 'error', connectionId);
-          statusText.textContent = 'Error';
-          return;
-        }
-      } else {
-        // Change to the specified directory
-        const cdResult = await window.ftpAPI.changeDirectory({ connectionId, path });
-        if (cdResult.success) {
-          currentPathElement.textContent = cdResult.path;
-          connection.currentDir = cdResult.path;
-        } else {
-          showNotification(`Failed to change directory: ${cdResult.error}`, 'error', connectionId);
-          statusText.textContent = 'Error';
-          return;
-        }
+      // First check if the connection exists in our state
+      const connection = state.connections.get(connectionId);
+      if (!connection) {
+        console.error("Connection not found in state:", connectionId);
+        return false;
+      }
+  
+      // Check if connection is still active
+      let isActive = true;
+      try {
+        isActive = await window.ftpAPI.isConnected({ connectionId });
+      } catch (error) {
+        console.warn("Error checking connection status:", error);
+        isActive = false;
       }
       
-      // Get file list
-      const result = await window.ftpAPI.listDirectory({ connectionId, path: '.' });
-      
-      if (result.success) {
-        renderFileList(connectionId, result.files);
-        statusText.textContent = 'Ready';
-        itemsCount.textContent = `${result.files.length} items`;
+      if (!isActive) {
+        showNotification("Connection lost. Attempting to reconnect...", "warning", connectionId);
         
-        // Cache the directory listing
-        if (!state.directoryCache.has(connectionId)) {
-          state.directoryCache.set(connectionId, new Map());
+        try {
+          // Attempt to clean up existing connection first
+          try {
+            await window.ftpAPI.disconnect({ connectionId });
+          } catch (err) {
+            // Ignore any errors during disconnect
+            console.warn("Error during disconnect (expected):", err);
+          }
+          
+          // Reconnect using the same parameters with keepalive and passive mode
+          const connectionOptions = {
+            ...connection.info,
+            keepalive: 30000,
+            passive: true
+          };
+          
+          const result = await window.ftpAPI.connect(connectionOptions);
+          
+          if (result.success) {
+            // Update connection ID in our state
+            state.connections.set(result.connectionId, {
+              id: result.connectionId,
+              info: connection.info,
+              currentDir: result.currentDir || '/'
+            });
+            
+            // If the old and new connection IDs are different, update UI elements
+            if (result.connectionId !== connectionId) {
+              // Update tab ID
+              const oldTab = document.getElementById(`tab-${connectionId}`);
+              if (oldTab) {
+                oldTab.id = `tab-${result.connectionId}`;
+                oldTab.dataset.connectionId = result.connectionId;
+              }
+              
+              // Update view ID
+              const oldView = document.getElementById(`connection-${connectionId}`);
+              if (oldView) {
+                oldView.id = `connection-${result.connectionId}`;
+                oldView.dataset.connectionId = result.connectionId;
+              }
+              
+              // Remove old connection from state
+              if (connectionId !== result.connectionId) {
+                state.connections.delete(connectionId);
+              }
+            }
+            
+            showNotification("Reconnected successfully!", "success", result.connectionId);
+            return true;
+          } else {
+            showNotification(`Failed to reconnect: ${result.error}`, "error", connectionId);
+            return false;
+          }
+        } catch (error) {
+          console.error("Reconnection error:", error);
+          showNotification(`Reconnection failed: ${error.message}`, "error", connectionId);
+          return false;
         }
-        state.directoryCache.get(connectionId).set(connection.currentDir, result.files);
-      } else {
-        showNotification(`Failed to list files: ${result.error}`, 'error', connectionId);
-        statusText.textContent = 'Error';
       }
+      
+      return true;
     } catch (error) {
-      console.error('Error refreshing file list:', error);
-      showNotification(`Error: ${error.message}`, 'error', connectionId);
-      statusText.textContent = 'Error';
+      console.error("Error in reconnectIfNeeded:", error);
+      return false;
     }
   }
+  
+  // Refresh file list
+// Refresh file list
+async function refreshFileList(connectionId, path) {
+  const connection = state.connections.get(connectionId);
+  if (!connection) return;
+
+  const connectionView = document.getElementById(`connection-${connectionId}`);
+  if (!connectionView) return;
+  
+  const fileList = connectionView.querySelector('.file-list');
+  const currentPathElement = connectionView.querySelector('.current-path');
+  const statusText = connectionView.querySelector('.status-text');
+  const itemsCount = connectionView.querySelector('.items-count');
+  
+  statusText.textContent = 'Loading...';
+  
+  try {
+    // Simplify operations and handle just two main cases:
+    // 1. If path is specified, change to that directory
+    // 2. If no path is specified, use the current directory
+    
+    if (path) {
+      // Change directory if path is specified
+      const cdResult = await window.ftpAPI.changeDirectory({ connectionId, path });
+      if (!cdResult.success) {
+        // If connection error, try to reconnect
+        if (cdResult.error && (cdResult.error.includes('closed') || cdResult.error.includes('FIN packet'))) {
+          const reconnected = await reconnectIfNeeded(connectionId);
+          if (!reconnected) {
+            statusText.textContent = 'Disconnected';
+            return;
+          }
+          // If reconnected, try one more time with the new connection ID
+          const newConnectionId = Array.from(state.connections.keys()).find(id => 
+            state.connections.get(id).info.host === connection.info.host);
+          
+          if (newConnectionId) {
+            // Retry with new connection ID
+            await refreshFileList(newConnectionId, path);
+            return;
+          }
+        }
+        
+        showNotification(`Failed to change directory: ${cdResult.error}`, 'error', connectionId);
+        statusText.textContent = 'Error';
+        return;
+      }
+      
+      // Update path display
+      currentPathElement.textContent = cdResult.path;
+      connection.currentDir = cdResult.path;
+    }
+    
+    // List the directory contents
+    const result = await window.ftpAPI.listDirectory({ 
+      connectionId, 
+      path: '.'  // Always list the current directory
+    });
+    
+    if (!result.success) {
+      // If connection error, try to reconnect
+      if (result.error && (result.error.includes('closed') || result.error.includes('FIN packet'))) {
+        const reconnected = await reconnectIfNeeded(connectionId);
+        if (!reconnected) {
+          statusText.textContent = 'Disconnected';
+          return;
+        }
+        // If reconnected, try one more time with the new connection ID
+        const newConnectionId = Array.from(state.connections.keys()).find(id => 
+          state.connections.get(id).info.host === connection.info.host);
+        
+        if (newConnectionId) {
+          // Retry with new connection ID
+          await refreshFileList(newConnectionId);
+          return;
+        }
+      }
+      
+      showNotification(`Failed to list files: ${result.error}`, 'error', connectionId);
+      statusText.textContent = 'Error';
+      return;
+    }
+    
+    // Successfully got directory listing
+    renderFileList(connectionId, result.files);
+    statusText.textContent = 'Ready';
+    itemsCount.textContent = `${result.files.length} items`;
+    
+    // Cache the directory listing
+    if (!state.directoryCache.has(connectionId)) {
+      state.directoryCache.set(connectionId, new Map());
+    }
+    state.directoryCache.get(connectionId).set(connection.currentDir, result.files);
+    
+  } catch (error) {
+    console.error('Error refreshing file list:', error);
+    
+    // If connection error, try to reconnect
+    if (error.message && (error.message.includes('closed') || error.message.includes('FIN packet'))) {
+      const reconnected = await reconnectIfNeeded(connectionId);
+      if (!reconnected) {
+        statusText.textContent = 'Disconnected';
+        return;
+      }
+      // If reconnected, try one more time with the new connection ID
+      const newConnectionId = Array.from(state.connections.keys()).find(id => 
+        state.connections.get(id).info.host === connection.info.host);
+      
+      if (newConnectionId) {
+        // Retry with new connection ID
+        await refreshFileList(newConnectionId, path);
+        return;
+      }
+    }
+    
+    showNotification(`Error: ${error.message}`, 'error', connectionId);
+    statusText.textContent = 'Error';
+  }
+}
   
   // Render file list
   function renderFileList(connectionId, files) {
@@ -1244,66 +1395,159 @@ function checkForFileChanges(connectionId, fileInfo) {
   console.log('Using local path:', fileInfo.localPath);
   console.log('Using remote path:', fileInfo.fullRemotePath || fileInfo.remotePath);
   
-  // Set up an interval to check if the file has been modified
-  const intervalId = setInterval(async () => {
-    try {
-      // Check if the connection still exists
-      if (!state.connections.has(connectionId)) {
-        clearInterval(intervalId);
-        return;
-      }
-      
-      // Check file stats to see if it has been modified
-      const stats = await window.ftpAPI.getFileStats(fileInfo.localPath);
-      
-      if (!stats.success) {
-        console.error('Error checking file stats:', stats.error);
-        return;
-      }
-      
-      const currentModTime = new Date(stats.modifiedTime);
-      
-      // Compare with the last checked time, not the original time
-      if (currentModTime > lastCheckedModTime) {
-        console.log('File modified:', fileInfo.fileName);
-        console.log('Previous mod time:', lastCheckedModTime);
-        console.log('Current mod time:', currentModTime);
-        
-        // Use fullRemotePath if available, otherwise fall back to remotePath
-        const remotePath = fileInfo.fullRemotePath || fileInfo.remotePath;
-        
-        // Update the file on the server
-        const result = await window.ftpAPI.uploadFrom({
-          connectionId,
-          localPath: fileInfo.localPath,
-          remotePath: remotePath
-        });
-        
-        if (result.success) {
-          showNotification(`Changes to ${fileInfo.fileName} saved back to server!`, 'success', connectionId);
-          // Update the last checked modification time
-          lastCheckedModTime = currentModTime;
-          
-          // Refresh file list to show updated modification times
-          await refreshFileList(connectionId);
-        } else {
-          showNotification(`Failed to save changes: ${result.error}`, 'error', connectionId);
+  // Create a file watcher using the native API
+  try {
+    // Clear any existing watchers for this file
+    if (state.fileWatchers && state.fileWatchers.has(fileInfo.localPath)) {
+      const oldWatcher = state.fileWatchers.get(fileInfo.localPath);
+      if (oldWatcher) {
+        clearInterval(oldWatcher.intervalId);
+        if (oldWatcher.nativeWatcher) {
+          try {
+            window.ftpAPI.unwatchFile(fileInfo.localPath, oldWatcher.nativeWatcher);
+          } catch (e) {
+            console.warn('Error unwatching file:', e);
+          }
         }
       }
-    } catch (error) {
-      console.error('Error checking for file changes:', error);
     }
-  }, 3000); // Check every 3 seconds
-  
-  // Store interval ID so we can clear it if needed
-  if (!state.fileWatchers) {
-    state.fileWatchers = new Map();
+
+    // Initialize watchers storage if needed
+    if (!state.fileWatchers) {
+      state.fileWatchers = new Map();
+    }
+    
+    // Create a native file watcher
+    window.ftpAPI.watchFile(fileInfo.localPath, async (err, stats) => {
+      if (err) {
+        console.error('Error watching file:', err);
+        return;
+      }
+      
+      try {
+        const currentModTime = new Date(stats.modifiedTime || stats.mtime);
+        
+        // Compare with the last checked time
+        if (currentModTime > lastCheckedModTime) {
+          console.log('File modified (from watcher):', fileInfo.fileName);
+          console.log('Previous mod time:', lastCheckedModTime);
+          console.log('Current mod time:', currentModTime);
+          
+          // Check if connection still exists
+          if (!state.connections.has(connectionId)) {
+            const reconnected = await reconnectIfNeeded(connectionId);
+            if (!reconnected) {
+              console.error('Cannot upload changes - connection lost and reconnection failed');
+              return;
+            }
+          }
+          
+          // Use fullRemotePath if available, otherwise fall back to remotePath
+          const remotePath = fileInfo.fullRemotePath || fileInfo.remotePath;
+          
+          // Update the file on the server
+          const result = await window.ftpAPI.uploadFrom({
+            connectionId,
+            localPath: fileInfo.localPath,
+            remotePath: remotePath
+          });
+          
+          if (result.success) {
+            showNotification(`Changes to ${fileInfo.fileName} saved back to server!`, 'success', connectionId);
+            // Update the last checked modification time
+            lastCheckedModTime = currentModTime;
+            
+            // Refresh file list to show updated modification times
+            await refreshFileList(connectionId);
+          } else {
+            showNotification(`Failed to save changes: ${result.error}`, 'error', connectionId);
+          }
+        }
+      } catch (error) {
+        console.error('Error handling file change:', error);
+      }
+    }).then(watcherId => {
+      // Store the watcher ID for later cleanup
+      state.fileWatchers.set(fileInfo.localPath, {
+        nativeWatcher: watcherId,
+        intervalId: null
+      });
+    }).catch(err => {
+      console.error('Error setting up file watcher:', err);
+      
+      // Fall back to interval-based polling if native watching fails
+      setupIntervalBasedWatcher();
+    });
+    
+    // Fallback function for interval-based watching
+    function setupIntervalBasedWatcher() {
+      console.log('Using fallback interval-based file watching for:', fileInfo.fileName);
+      
+      // Set up an interval to check if the file has been modified
+      const intervalId = setInterval(async () => {
+        try {
+          // Check if the connection still exists
+          if (!state.connections.has(connectionId)) {
+            clearInterval(intervalId);
+            state.fileWatchers.delete(fileInfo.localPath);
+            return;
+          }
+          
+          // Check file stats to see if it has been modified
+          const stats = await window.ftpAPI.getFileStats(fileInfo.localPath);
+          
+          if (!stats.success) {
+            console.error('Error checking file stats:', stats.error);
+            return;
+          }
+          
+          const currentModTime = new Date(stats.modifiedTime);
+          
+          // Compare with the last checked time
+          if (currentModTime > lastCheckedModTime) {
+            console.log('File modified (from interval):', fileInfo.fileName);
+            console.log('Previous mod time:', lastCheckedModTime);
+            console.log('Current mod time:', currentModTime);
+            
+            // Use fullRemotePath if available, otherwise fall back to remotePath
+            const remotePath = fileInfo.fullRemotePath || fileInfo.remotePath;
+            
+            // Update the file on the server
+            const result = await window.ftpAPI.uploadFrom({
+              connectionId,
+              localPath: fileInfo.localPath,
+              remotePath: remotePath
+            });
+            
+            if (result.success) {
+              showNotification(`Changes to ${fileInfo.fileName} saved back to server!`, 'success', connectionId);
+              // Update the last checked modification time
+              lastCheckedModTime = currentModTime;
+              
+              // Refresh file list to show updated modification times
+              await refreshFileList(connectionId);
+            } else {
+              showNotification(`Failed to save changes: ${result.error}`, 'error', connectionId);
+            }
+          }
+        } catch (error) {
+          console.error('Error checking for file changes:', error);
+        }
+      }, 3000); // Check every 3 seconds
+      
+      // Store interval ID for cleanup
+      state.fileWatchers.set(fileInfo.localPath, {
+        nativeWatcher: null,
+        intervalId: intervalId
+      });
+    }
+    
+    // Return true to indicate successful setup
+    return true;
+  } catch (error) {
+    console.error('Error setting up file watcher:', error);
+    return false;
   }
-  
-  // Store by file path to avoid duplicates
-  state.fileWatchers.set(fileInfo.localPath, intervalId);
-  
-  return intervalId;
 }
 
 // Save all edited files for a connection
